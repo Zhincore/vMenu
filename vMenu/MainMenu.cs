@@ -39,6 +39,7 @@ namespace vMenuClient
         public static MpPedCustomization MpPedCustomizationMenu { get; private set; }
         public static TimeOptions TimeOptionsMenu { get; private set; }
         public static WeatherOptions WeatherOptionsMenu { get; private set; }
+        public static DensityOptions DensityOptionsMenu { get; private set; }
         public static WeaponOptions WeaponOptionsMenu { get; private set; }
         public static WeaponLoadouts WeaponLoadoutsMenu { get; private set; }
         public static Recording RecordingMenu { get; private set; }
@@ -713,6 +714,19 @@ namespace vMenuClient
                 WeatherOptionsMenu = new WeatherOptions();
                 Menu menu = WeatherOptionsMenu.GetMenu();
                 MenuItem button = new MenuItem("Weather Options", "Change all weather related options here.")
+                {
+                    Label = "→→→"
+                };
+                AddMenu(WorldSubmenu, menu, button);
+            }
+
+            // Add the time options menu.
+            // check for 'not true' to make sure that it _ONLY_ gets disabled if the owner _REALLY_ wants it disabled, not if they accidentally spelled "false" wrong or whatever.
+            if (IsAllowed(Permission.TOMenu) && GetSettingsBool(Setting.vmenu_enable_density_sync))
+            {
+                DensityOptionsMenu = new DensityOptions();
+                Menu menu = DensityOptionsMenu.GetMenu();
+                MenuItem button = new MenuItem("Density Options", "Change the vehicle or pedestrian density.")
                 {
                     Label = "→→→"
                 };

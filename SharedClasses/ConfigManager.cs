@@ -56,6 +56,11 @@ namespace vMenuShared
             vmenu_current_hour,
             vmenu_current_minute,
             vmenu_sync_to_machine_time,
+
+            // Density settings
+            vmenu_enable_density_sync,
+            vmenu_current_vehicle_density,
+            vmenu_current_ped_density,
         }
 
         /// <summary>

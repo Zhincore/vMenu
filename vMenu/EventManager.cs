@@ -26,6 +26,8 @@ namespace vMenuClient
         public static bool DynamicWeatherEnabled => GetSettingsBool(Setting.vmenu_enable_dynamic_weather);
         public static bool IsBlackoutEnabled => GetSettingsBool(Setting.vmenu_blackout_enabled);
         public static int WeatherChangeTime => MathUtil.Clamp(GetSettingsInt(Setting.vmenu_weather_change_duration), 0, 45);
+        public static float GetServerVehicleDensity => MathUtil.Clamp(GetSettingsFloat(Setting.vmenu_current_vehicle_density), 0f, 1f);
+        public static float GetServerPedDensity => MathUtil.Clamp(GetSettingsFloat(Setting.vmenu_current_ped_density), 0f, 1f);
 
         /// <summary>
         /// Constructor.
@@ -52,6 +54,8 @@ namespace vMenuClient
                 Tick += WeatherSync;
             if (GetSettingsBool(Setting.vmenu_enable_time_sync))
                 Tick += TimeSync;
+            if (GetSettingsBool(Setting.vmenu_enable_density_sync))
+                Tick += DensitySync;
 
             RegisterNuiCallbackType("disableImportExportNUI");
             RegisterNuiCallbackType("importData");
@@ -183,6 +187,7 @@ namespace vMenuClient
             ForceSocialClubUpdate();
         }
 
+
         /// <summary>
         /// Loads/unloads the snow fx particles if needed.
         /// </summary>
@@ -242,6 +247,23 @@ namespace vMenuClient
             {
                 await Delay(MathUtil.Clamp(GetServerMinuteDuration, 100, 2000));
             }
+        }
+
+        /// <summary>
+        /// Update vehicle and ped density.
+        /// </summary>
+        private async Task DensitySync()
+        {
+            float vehicleDensity = GetServerVehicleDensity;
+            SetVehicleDensityMultiplierThisFrame(vehicleDensity);
+            SetRandomVehicleDensityMultiplierThisFrame(vehicleDensity);
+            SetParkedVehicleDensityMultiplierThisFrame(vehicleDensity);
+
+            float pedDensity = GetServerPedDensity;
+            SetPedDensityMultiplierThisFrame(pedDensity);
+            SetScenarioPedDensityMultiplierThisFrame(pedDensity, pedDensity);
+
+            await Task.FromResult(0);
         }
 
         /// <summary>

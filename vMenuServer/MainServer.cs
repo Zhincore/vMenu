@@ -131,6 +131,8 @@ namespace vMenuServer
         }
         private long lastWeatherChange = 0;
 
+
+
         private readonly List<string> CloudTypes = new List<string>()
         {
             "Cloudy 01",
@@ -172,6 +174,18 @@ namespace vMenuServer
             "XMAS",
             "HALLOWEEN"
         };
+
+        // Density
+        private float CurrentVehicleDensity
+        {
+            get { return MathUtil.Clamp(GetSettingsFloat(Setting.vmenu_current_vehicle_density), 0f, 1f); }
+            set { SetConvarReplicated(Setting.vmenu_current_vehicle_density.ToString(), MathUtil.Clamp(value, 0, 23).ToString()); }
+        }
+        private float CurrentPedDensity
+        {
+            get { return MathUtil.Clamp(GetSettingsFloat(Setting.vmenu_current_ped_density), 0f, 1f); }
+            set { SetConvarReplicated(Setting.vmenu_current_ped_density.ToString(), MathUtil.Clamp(value, 0f, 1f).ToString()); }
+        }
         #endregion
 
         #region Constructor
@@ -380,6 +394,37 @@ namespace vMenuServer
                             Debug.WriteLine("Invalid syntax. Use: ^5vmenuserver time <freeze|<hour> <minute>>^7 instead.");
                         }
                     }
+                    else if (args[0].ToString().ToLower() == "density") 
+                    {
+                        if (float.TryParse(args[2].ToString(), out float density)) 
+                        {
+                            if (density <= 0f && density >= 1f)
+                            {
+                                if (args[1].ToString().ToLower() == "vehicle") 
+                                {
+                                    TriggerEvent("vMenu:UpdateServerVehicleDensity", density);
+                                    Debug.WriteLine($"Vehicle density is now {density}.");
+                                }
+                                else if (args[1].ToString().ToLower() == "peds") 
+                                {
+                                    TriggerEvent("vMenu:UpdateServerPedDensity", density);
+                                    Debug.WriteLine($"Ped density is now {density}.");
+                                } 
+                                else 
+                                {
+                                    Debug.WriteLine("Invalid syntax. Use: ^5vmenuserver density <vehicles|peds> <value>^7 instead.");
+                                }
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Invalid density provided. Value must be between 0.0 and 1.0.");
+                            }
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Invalid syntax. Use: ^5vmenuserver density <vehicles|peds> <value>^7 instead.");
+                        }
+                    }
                     else if (args[0].ToString().ToLower() == "ban" && source < 1)  // only do this via server console (server id < 1)
                     {
                         if (args.Count > 3)
@@ -451,6 +496,7 @@ namespace vMenuServer
                         Debug.WriteLine("(server console only): vmenuserver unban <uuid>");
                         Debug.WriteLine("vmenuserver weather <new weather type | dynamic <true | false>>");
                         Debug.WriteLine("vmenuserver time <freeze|<hour> <minute>>");
+                        Debug.WriteLine("vmenuserver density <vehicles|peds> <density>");
                         Debug.WriteLine("vmenuserver migrate (This copies all banned players in the bans.json file to the new ban system in vMenu v3.3.0, you only need to do this once)");
                     }
                     else if (args[0].ToString().ToLower() == "migrate" && source < 1)
@@ -665,7 +711,7 @@ namespace vMenuServer
         }
         #endregion
 
-        #region Sync weather & time with clients
+        #region Sync weather, time & density with clients
         /// <summary>
         /// Update the weather for all clients.
         /// </summary>
@@ -723,6 +769,25 @@ namespace vMenuServer
             CurrentHours = newHours;
             CurrentMinutes = newMinutes;
             FreezeTime = freezeTimeNew;
+        }
+
+        /// <summary>
+        /// Set and sync vehicle density to all clients.
+        /// </summary>
+        /// <param name="newDensity"></param>
+        [EventHandler("vMenu:UpdateServerVehicleDensity")]
+        private void UpdateVehicleDensity(float newDensity)
+        {
+            CurrentVehicleDensity = newDensity;
+        }
+        /// <summary>
+        /// Set and sync ped density to all clients.
+        /// </summary>
+        /// <param name="newDensity"></param>
+        [EventHandler("vMenu:UpdateServerPedDensity")]
+        private void UpdatePedDensity(float newDensity)
+        {
+            CurrentPedDensity = newDensity;
         }
         #endregion
 
