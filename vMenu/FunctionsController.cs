@@ -1933,24 +1933,10 @@ namespace vMenuClient
         {
             if (MainMenu.MiscSettingsMenu != null && Game.PlayerPed.IsDead)
             {
-                bool restoreDefault = false;
-                if (MainMenu.MiscSettingsMenu.MiscRespawnDefaultCharacter)
+
+                if (MainMenu.MiscSettingsMenu.RestorePlayerAppearance && IsAllowed(Permission.MSRestoreAppearance))
                 {
-                    if (!string.IsNullOrEmpty(GetResourceKvpString("vmenu_default_character")))
-                    {
-                        restoreDefault = true;
-                    }
-                    else
-                    {
-                        Notify.Error("You did not set a saved character to restore to. Do so in the ~g~MP Ped Customization~s~ > ~g~Saved Characters~s~ menu.");
-                    }
-                }
-                if (!restoreDefault)
-                {
-                    if (MainMenu.MiscSettingsMenu.RestorePlayerAppearance && IsAllowed(Permission.MSRestoreAppearance))
-                    {
-                        await SavePed("vMenu_tmp_saved_ped");
-                    }
+                    await SavePed("vMenu_tmp_saved_ped");
                 }
 
                 if (MainMenu.MiscSettingsMenu.RestorePlayerWeapons && IsAllowed(Permission.MSRestoreWeapons) || (MainMenu.WeaponLoadoutsMenu != null && MainMenu.WeaponLoadoutsMenu.WeaponLoadoutsSetLoadoutOnRespawn && IsAllowed(Permission.WLEquipOnRespawn)))
@@ -1971,16 +1957,9 @@ namespace vMenuClient
                     await Delay(0);
                 }
 
-                if (restoreDefault)
+                if (IsTempPedSaved() && MainMenu.MiscSettingsMenu.RestorePlayerAppearance && IsAllowed(Permission.MSRestoreAppearance))
                 {
-                    await RestorePlayerAppearance();
-                }
-                else
-                {
-                    if (IsTempPedSaved() && MainMenu.MiscSettingsMenu.RestorePlayerAppearance && IsAllowed(Permission.MSRestoreAppearance))
-                    {
-                        LoadSavedPed("vMenu_tmp_saved_ped", false);
-                    }
+                    LoadSavedPed("vMenu_tmp_saved_ped", false);
                 }
 
                 if (MainMenu.MiscSettingsMenu != null && MainMenu.MiscSettingsMenu.RestorePlayerWeapons && IsAllowed(Permission.MSRestoreWeapons) || (MainMenu.WeaponLoadoutsMenu != null && MainMenu.WeaponLoadoutsMenu.WeaponLoadoutsSetLoadoutOnRespawn && IsAllowed(Permission.WLEquipOnRespawn)))
