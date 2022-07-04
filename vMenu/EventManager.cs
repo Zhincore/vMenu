@@ -26,8 +26,8 @@ namespace vMenuClient
         public static bool DynamicWeatherEnabled => GetSettingsBool(Setting.vmenu_enable_dynamic_weather);
         public static bool IsBlackoutEnabled => GetSettingsBool(Setting.vmenu_blackout_enabled);
         public static int WeatherChangeTime => MathUtil.Clamp(GetSettingsInt(Setting.vmenu_weather_change_duration), 0, 45);
-        public static float GetServerVehicleDensity => MathUtil.Clamp(GetSettingsFloat(Setting.vmenu_current_vehicle_density), 0f, 1f);
-        public static float GetServerPedDensity => MathUtil.Clamp(GetSettingsFloat(Setting.vmenu_current_ped_density), 0f, 1f);
+        public static float GetServerVehicleDensity => GetSettingsFloat(Setting.vmenu_current_vehicle_density);
+        public static float GetServerPedDensity => GetSettingsFloat(Setting.vmenu_current_ped_density);
 
         /// <summary>
         /// Constructor.
@@ -88,7 +88,7 @@ namespace vMenuClient
                 firstSpawn = false;
                 if (MainMenu.MiscSettingsMenu != null && MainMenu.MpPedCustomizationMenu != null && MainMenu.MiscSettingsMenu.MiscRespawnDefaultCharacter)
                 {
-                    if (!string.IsNullOrEmpty(GetResourceKvpString("vmenu_default_character")) && !GetSettingsBool(Setting.vmenu_disable_spawning_as_default_character)) 
+                    if (!string.IsNullOrEmpty(GetResourceKvpString("vmenu_default_character")) && !GetSettingsBool(Setting.vmenu_disable_spawning_as_default_character))
                     {
                         await RestorePlayerAppearance();
                     }
@@ -263,7 +263,7 @@ namespace vMenuClient
             SetPedDensityMultiplierThisFrame(pedDensity);
             SetScenarioPedDensityMultiplierThisFrame(pedDensity, pedDensity);
 
-            await Task.FromResult(0);
+            await Delay(0);
         }
 
         /// <summary>
